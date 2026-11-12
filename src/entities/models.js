@@ -186,7 +186,18 @@ const assets = {};
 export async function loadCreatureAssets(onProgress) {
   const loader = new GLTFLoader();
   const base = import.meta.env.BASE_URL || './';
-  const load = (url) => new Promise((res, rej) => loader.load(url, res, undefined, rej));
+  // Embedded builds (e.g. a single-page host that cannot serve .glb) may provide the models
+  // as base64 in window.__RIMEHOLD_MODELS; otherwise fetch them from assets/models/.
+  const embedded = typeof window !== 'undefined' && window.__RIMEHOLD_MODELS;
+  const load = (url) => new Promise((res, rej) => {
+    const key = url.split('/').pop().replace('.glb', '');
+    if (embedded && embedded[key]) {
+      const bin = atob(embedded[key]);
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      loader.parse(buf.buffer, '', res, rej);
+    } else loader.load(url, res, undefined, rej);
+  });
   try {
     const [fox, bot] = await Promise.all([load(base + 'assets/models/fox.glb'), load(base + 'assets/models/sentinel.glb')]);
     assets.wolf = fox; assets.sentinel = bot;
