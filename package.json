@@ -1,0 +1,20 @@
+{
+  "name": "rimehold",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "RIMEHOLD — a PSX-styled open-world roguelike showcase built on raw three.js (no engine).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lil-gui": "^0.21.0",
+    "simplex-noise": "^4.0.3",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  }
+}

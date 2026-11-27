@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rimehold</title>
+  <meta name="description" content="A PSX-styled open-world roguelike showcase built on raw three.js — no engine." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Pixelify+Sans:wght@400;600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- ============ HUD ============ -->
+  <div id="hud" class="hidden">
+    <div id="compass"><div id="compass-strip"></div><div id="compass-needle"></div></div>
+    <div id="target-bar" class="hidden"><div class="name"></div><div class="bar"><i></i></div></div>
+    <div id="crosshair"></div>
+    <div id="prompt" class="hidden"></div>
+    <div id="notes"></div>
+    <div id="quest-tracker"></div>
+    <div id="bars">
+      <div class="bar magicka"><i></i><b></b></div>
+      <div class="bar health"><i></i><b></b></div>
+      <div class="bar stamina"><i></i><b></b></div>
+    </div>
+    <div id="hotbar"></div>
+    <div id="dmg-layer"></div>
+    <div id="vignette-hurt"></div>
+    <div id="underwater"></div>
+    <div id="fps"></div>
+  </div>
+
+  <!-- ============ Screens ============ -->
+  <div id="title" class="screen">
+    <div class="title-wrap">
+      <div class="title-kicker">a psx roguelike saga</div>
+      <h1>RIMEHOLD</h1>
+      <div class="title-sub">— The Vale of Frost and Barrows —</div>
+      <div class="menu">
+        <button data-act="start" class="primary">Begin a New Run</button>
+        <label class="seed">Seed <input id="seed-input" maxlength="12" spellcheck="false" /></label>
+        <button data-act="graphics">Graphics Mixes</button>
+        <button data-act="controls">Controls</button>
+      </div>
+      <div class="title-foot" id="title-foot"></div>
+    </div>
+  </div>
+
+  <div id="loading" class="screen hidden"><div class="loading-text">Forging the vale…</div><div class="loading-bar"><i></i></div></div>
+
+  <div id="pause" class="screen hidden">
+    <div class="panel">
+      <h2>Paused</h2>
+      <div class="menu">
+        <button data-act="resume" class="primary">Resume</button>
+        <button data-act="graphics">Graphics Mixes</button>
+        <button data-act="controls">Controls</button>
+        <button data-act="abandon">Abandon Run</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="graphics" class="screen hidden">
+    <div class="panel wide">
+      <h2>Graphics Mixes</h2>
+      <p class="hint">Each mix blends 1997-era rendering tricks with modern GPU techniques. Press <kbd>1</kbd>–<kbd>6</kbd> in-game to swap live. Fine-tune everything in the panel on the right.</p>
+      <div id="preset-grid"></div>
+      <div class="menu row"><button data-act="back" class="primary">Back</button></div>
+    </div>
+  </div>
+
+  <div id="controls" class="screen hidden">
+    <div class="panel">
+      <h2>Controls</h2>
+      <table class="keys">
+        <tr><td><kbd>W A S D</kbd></td><td>Move</td></tr>
+        <tr><td><kbd>Mouse</kbd></td><td>Look</td></tr>
+        <tr><td><kbd>LMB</kbd></td><td>Attack — hold for power attack</td></tr>
+        <tr><td><kbd>RMB</kbd></td><td>Cast Firebolt</td></tr>
+        <tr><td><kbd>Q</kbd></td><td>Rune Burst (knockback shockwave)</td></tr>
+        <tr><td><kbd>Shift</kbd></td><td>Sprint</td></tr>
+        <tr><td><kbd>Space</kbd></td><td>Jump</td></tr>
+        <tr><td><kbd>C</kbd></td><td>Dodge dash</td></tr>
+        <tr><td><kbd>E</kbd></td><td>Talk / loot / open</td></tr>
+        <tr><td><kbd>F</kbd></td><td>Drink healing draught</td></tr>
+        <tr><td><kbd>Tab</kbd></td><td>Character &amp; inventory</td></tr>
+        <tr><td><kbd>M</kbd></td><td>Map of the vale</td></tr>
+        <tr><td><kbd>1</kbd>–<kbd>6</kbd></td><td>Swap graphics mix</td></tr>
+        <tr><td><kbd>T</kbd> (hold)</td><td>Fast-forward time of day</td></tr>
+        <tr><td><kbd>Y</kbd></td><td>Cycle weather</td></tr>
+        <tr><td><kbd>G</kbd></td><td>Toggle tuning panel</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Pause</td></tr>
+      </table>
+      <div class="menu row"><button data-act="back" class="primary">Back</button></div>
+    </div>
+  </div>
+
+  <div id="dialogue" class="screen hidden">
+    <div class="dlg">
+      <div class="dlg-name"></div>
+      <div class="dlg-text"></div>
+      <div class="dlg-options"></div>
+    </div>
+  </div>
+
+  <div id="inventory" class="screen hidden">
+    <div class="panel wide inv">
+      <div class="inv-col">
+        <h2>Character</h2>
+        <div id="char-stats"></div>
+        <h3>Perks</h3>
+        <div id="char-perks"></div>
+      </div>
+      <div class="inv-col">
+        <h2>Inventory</h2>
+        <div id="inv-list"></div>
+      </div>
+      <div class="inv-close"><kbd>Tab</kbd> close</div>
+    </div>
+  </div>
+
+  <div id="map" class="screen hidden">
+    <div class="map-wrap"><canvas id="map-canvas" width="512" height="512"></canvas><div class="map-legend"></div><div class="inv-close"><kbd>M</kbd> close</div></div>
+  </div>
+
+  <div id="levelup" class="screen hidden">
+    <div class="panel wide">
+      <h2>The Runes Answer</h2>
+      <p class="hint">You have reached level <span id="lvl-num"></span>. Choose a boon.</p>
+      <div id="perk-choices"></div>
+    </div>
+  </div>
+
+  <div id="death" class="screen hidden">
+    <div class="panel">
+      <h2 class="blood">You Have Fallen</h2>
+      <div class="run-stats"></div>
+      <div class="menu"><button data-act="newrun" class="primary">Begin a New Run</button><button data-act="totitle">Title</button></div>
+    </div>
+  </div>
+
+  <div id="victory" class="screen hidden">
+    <div class="panel">
+      <h2 class="gold">The Vale Is Cleansed</h2>
+      <p class="hint">The Barrow Thane lies still. Rimehold Vale breathes again — but the north is wide, and other regions await in the full saga.</p>
+      <div class="run-stats"></div>
+      <div class="menu"><button data-act="continue" class="primary">Keep Exploring</button><button data-act="newrun">Begin a New Run</button></div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
